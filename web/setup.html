@@ -1,0 +1,152 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Table setup</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#12101a; color:#e8e4f0; font:16px/1.5 system-ui,sans-serif;
+         padding:1.2rem; max-width:44rem; margin-inline:auto; }
+  h1 { font-size:1.3rem; margin:0 0 .2rem; }
+  h2 { font-size:1rem; margin:1.6rem 0 .5rem; color:#b9a9e8; font-weight:600; }
+  p.sub { color:#9a92ad; margin:0 0 1.2rem; font-size:.9rem; }
+  label { display:block; font-size:.8rem; color:#9a92ad; margin:.6rem 0 .2rem; }
+  input, select { width:100%; box-sizing:border-box; background:#1c1830; color:#e8e4f0;
+         border:1px solid #362e55; border-radius:8px; padding:.6rem .7rem; font-size:1rem; }
+  button { background:#5b44a8; color:#fff; border:0; border-radius:8px; padding:.65rem 1.1rem;
+         font-size:1rem; cursor:pointer; margin-top:.9rem; }
+  button:disabled { opacity:.5; cursor:default; }
+  button.ghost { background:#2a2440; }
+  button.tiny { padding:.25rem .6rem; font-size:.8rem; margin:0; }
+  .row { display:flex; gap:.6rem; align-items:flex-end; }
+  .row > div { flex:1; }
+  ol { padding-left:1.2rem; color:#c9c2da; font-size:.92rem; }
+  ol code { background:#1c1830; padding:.1rem .35rem; border-radius:4px; }
+  .seat { display:flex; justify-content:space-between; align-items:center; gap:.6rem;
+          background:#1a1628; border:1px solid #2e2748; border-radius:10px;
+          padding:.6rem .8rem; margin-bottom:.5rem; }
+  .seat b { display:block; }
+  .seat small { color:#9a92ad; }
+  .msg { margin-top:.9rem; padding:.6rem .8rem; border-radius:8px; font-size:.9rem;
+         white-space:pre-wrap; }
+  .ok { background:#1c3324; border:1px solid #2f6b45; }
+  .err { background:#3a1f26; border:1px solid #7a3244; }
+  a { color:#b9a9e8; }
+</style>
+
+<h1>Table setup</h1>
+<p class="sub">Import each player's D&amp;D Beyond sheet by pasting the link. No typing
+nine-digit ids into a microphone.</p>
+
+<h2>What each player has to do first</h2>
+<ol>
+  <li>Open their character on D&amp;D Beyond.</li>
+  <li>Click the <b>gear / cog</b> icon (top right of the sheet) &rarr; <b>Character Settings</b>.</li>
+  <li>Set <b>Character Privacy</b> to <b>Public</b>. This is the only step that matters —
+      the importer reads the public sheet, so a private one returns nothing.</li>
+  <li>Send you the sheet URL: <code>dndbeyond.com/characters/<b>154114558</b></code></li>
+</ol>
+
+<h2>Campaign</h2>
+<select id="camp"></select>
+<div class="row">
+  <div>
+    <label>or create a new one</label>
+    <input id="newname" placeholder="The Salt Road">
+  </div>
+  <button class="ghost" id="mk">Create</button>
+</div>
+
+<h2>Seat a player</h2>
+<div class="row">
+  <div>
+    <label>Player's name (what you'll call them at the table)</label>
+    <input id="player" placeholder="Alex">
+  </div>
+</div>
+<label>D&amp;D Beyond sheet link or id</label>
+<input id="sheet" placeholder="https://www.dndbeyond.com/characters/154114558">
+<button id="add">Import &amp; seat</button>
+<div id="msg"></div>
+
+<h2>At this table</h2>
+<div id="seats"></div>
+<button class="ghost" id="resync">Re-read every sheet</button>
+
+<script>
+const $ = s => document.querySelector(s);
+const say = (t, bad) => { const m = $("#msg"); m.className = "msg " + (bad ? "err" : "ok");
+                          m.textContent = t; };
+
+async function api(url, opts) {
+  const r = await fetch(url, opts);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.detail || r.statusText);
+  return d;
+}
+
+async function loadCampaigns(pick) {
+  const d = await api("/campaigns");
+  $("#camp").innerHTML = d.campaigns
+    .map(c => `<option${(pick || d.current) === c.name ? " selected" : ""}>${c.name}</option>`)
+    .join("");
+  loadSeats();
+}
+
+async function loadSeats() {
+  const name = $("#camp").value;
+  if (!name) { $("#seats").innerHTML = ""; return; }
+  const d = await api(`/campaigns/${encodeURIComponent(name)}/players`);
+  $("#seats").innerHTML = d.players.length ? d.players.map(p => `
+    <div class="seat">
+      <div><b>${p.character || "(no character)"}</b>
+           <small>${p.player} &middot; ${p.notes || "not imported"}</small></div>
+      <button class="tiny ghost" data-drop="${encodeURIComponent(p.player)}">Remove</button>
+    </div>`).join("") : `<p class="sub">Nobody seated yet.</p>`;
+  document.querySelectorAll("[data-drop]").forEach(b => b.onclick = async () => {
+    await api(`/campaigns/${encodeURIComponent(name)}/players/${b.dataset.drop}`,
+              {method: "DELETE"});
+    loadSeats();
+  });
+}
+
+$("#camp").onchange = loadSeats;
+
+$("#mk").onclick = async () => {
+  const name = $("#newname").value.trim();
+  if (!name) return say("Give the campaign a name.", true);
+  try { await api("/campaigns", {method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({name})});
+        $("#newname").value = ""; say(`Created "${name}".`); loadCampaigns(name); }
+  catch (e) { say(e.message, true); }
+};
+
+$("#add").onclick = async () => {
+  const player = $("#player").value.trim(), sheet = $("#sheet").value.trim();
+  if (!player || !sheet) return say("Both the player's name and the sheet link.", true);
+  $("#add").disabled = true; say("Reading the sheet…");
+  try {
+    const d = await api(`/campaigns/${encodeURIComponent($("#camp").value)}/players`,
+      {method: "POST", headers: {"Content-Type": "application/json"},
+       body: JSON.stringify({player, sheet})});
+    say(`${player} is playing ${d.character}.\n${d.detail}`);
+    $("#player").value = ""; $("#sheet").value = "";
+    loadSeats();
+  } catch (e) { say(e.message, true); }
+  finally { $("#add").disabled = false; }
+};
+
+$("#resync").onclick = async () => {
+  say("Re-reading…");
+  try {
+    const d = await api(`/campaigns/${encodeURIComponent($("#camp").value)}/resync`,
+                        {method: "POST"});
+    say(d.resynced.length
+      ? d.resynced.map(r => r.error ? `${r.character}: ${r.error}`
+          : `${r.character}: L${r.level}, ${r.max_hp} HP, AC ${r.ac}`).join("\n")
+      : "Nothing imported from D&D Beyond yet.");
+    loadSeats();
+  } catch (e) { say(e.message, true); }
+};
+
+loadCampaigns();
+</script>

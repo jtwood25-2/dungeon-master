@@ -1,0 +1,12 @@
+# Pinned deliberately, and the pin matters.
+#
+# onnxruntime-gpu links a specific CUDA MAJOR. 1.29 links CUDA 13 (cublasLt64_13.dll) while
+# torch here is CUDA 12.8, so it loads and then fails at session creation -- kokoro silently
+# falls back to the CPU and every spoken line costs 3.66s instead of 0.43s.
+#
+# It also must be installed ALONE: the CPU-only `onnxruntime` package shares the same module
+# directory and shadows this one whenever something pulls it in as a dependency. If kokoro
+# ever logs "running on the CPU", that is what happened. Repair with:
+#   pip uninstall -y onnxruntime
+#   pip install --force-reinstall --no-deps onnxruntime-gpu==1.24.4
+onnxruntime-gpu==1.24.4

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/open_feedback.py\" 2>/dev/null || true",
+            "timeout": 15,
+            "statusMessage": "Checking feedback queue..."
+          }
+        ]
+      }
+    ]
+  }
+}

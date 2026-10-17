@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Dungeon Master</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>🐉 Dungeon Master</h1>
+    <span id="conn" class="pill off">offline</span>
+  </header>
+  <div class="topbar">
+    <button id="campaignBtn" class="hf tiny">📖 <span id="campaignName">…</span></button>
+    <button id="seatBtn" class="hf tiny">🪑 <span id="seatName">Pick character</span></button>
+    <button id="spkBtn" class="hf tiny">🔊 Speaker</button>
+    <button id="handsfree" class="hf tiny">🎙️ Auto</button>
+    <button id="endTurn" class="hf tiny endturn" hidden>✔ End my turn</button>
+    <button id="stop" class="hf tiny" hidden>✋ Stop</button>
+    <button id="mapBtn" class="hf tiny" hidden>🗺 Map</button>
+    <button id="sheetBtn" class="hf tiny">🧙 Sheets</button>
+    <button id="enroll" class="hf tiny">＋ Voice</button>
+    <button id="notesBtn" class="hf tiny">📝<span id="notesCount"></span></button>
+    <button id="updateBtn" class="hf tiny">⟳ Update</button>
+  </div>
+
+  <div id="mapPanel" class="sheet" hidden>
+    <div class="sheet-head">
+      <b id="mapTitle">Battle map</b>
+      <div>
+        <button id="mapLib" class="hf tiny">🗂 Saved</button>
+        <button id="mapPrint" class="hf tiny">🖨 Print</button>
+        <button id="mapClose" class="hf tiny">✕ Close</button>
+      </div>
+    </div>
+    <div id="mapLibList" class="sheet-body" hidden></div>
+    <div id="mapBody" class="sheet-body map-body"></div>
+  </div>
+
+  <div id="sheetPanel" class="sheet" hidden>
+    <div class="sheet-head">
+      <b>Character sheets</b>
+      <div>
+        <a id="shPrint" class="hf tiny" href="#" target="_blank" rel="noopener">🖨 Print all</a>
+        <button id="shClose" class="hf tiny">✕ Close</button>
+      </div>
+    </div>
+    <div id="shBody" class="sheet-body"></div>
+  </div>
+
+  <div id="notesPanel" class="sheet" hidden>
+    <div class="sheet-head">
+      <b>Feedback</b>
+      <button id="fbClose" class="hf tiny">✕ Close</button>
+    </div>
+    <div id="fbBody" class="sheet-body"></div>
+    <div class="sheet-new">
+      <input id="fbText" placeholder="Add a note" autocomplete="off">
+      <button id="fbAdd" class="hf tiny">＋ Add note</button>
+      <div class="cp-empty" style="padding:6px 0 0">Or just say “feedback …” while you play.</div>
+    </div>
+  </div>
+
+  <div id="seatPanel" class="sheet" hidden>
+    <h3>Who are you playing?</h3>
+    <div id="seatList" class="seatlist"></div>
+  </div>
+  <div id="campaignPanel" class="sheet" hidden>
+    <div class="sheet-head">
+      <b>Campaigns</b>
+      <button id="cpClose" class="hf tiny">✕ Close</button>
+    </div>
+    <div id="cpBody" class="sheet-body"></div>
+    <div class="sheet-new">
+      <input id="cpName" placeholder="New campaign name" autocomplete="off" autocapitalize="words">
+      <input id="cpPremise" placeholder="Premise (optional)" autocomplete="off">
+      <button id="cpCreate" class="hf tiny">＋ Create &amp; play</button>
+    </div>
+  </div>
+
+  <main>
+    <div id="startBar" class="startbar" hidden>
+      <button id="startBtn" class="talk start">▶ Start session</button>
+      <div id="startHint" class="start-hint"></div>
+    </div>
+    <div id="initBar" class="initbar" hidden></div>
+    <div id="log" class="log"></div>
+
+    <div class="latency" id="latency">
+      <div><span>STT</span><b id="l-stt">–</b></div>
+      <div><span>DM thinks</span><b id="l-llm">–</b></div>
+      <div><span>→ first voice</span><b id="l-audio">–</b></div>
+    </div>
+  </main>
+
+  <div id="enrollPanel" class="epanel" hidden>
+    <!-- Tap your character, then type your own name. Typing the character name too was five
+         people spelling "Gus of The Slippery Rock" into a phone before a session could start. -->
+    <div id="epWho" class="epwho"></div>
+    <input id="epName" placeholder="Your name" autocomplete="off" autocapitalize="words">
+    <button id="eRec" class="talk" disabled>Pick your character first</button>
+  </div>
+  <button id="talk" class="talk">Hold to Speak</button>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

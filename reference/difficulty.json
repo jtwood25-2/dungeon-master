@@ -1,0 +1,38 @@
+{
+  "_comment": "Table difficulty preferences. Structured, not prose, so encounter.py can ENFORCE the combat target rather than the DM merely being asked to aim for it. Edit these numbers to retune the table; nothing in code needs to change.",
+  "version": 1,
+  "combat": {
+    "target": "very difficult but survivable",
+    "floor_band": "hard",
+    "aim_multiple": 1.0,
+    "ceiling_multiple": 1.6,
+    "rules": [
+      "Default to HARD or DEADLY. A medium fight is the exception, not the baseline, and trivial/easy is only ever a deliberate mook wave that exists to burn resources.",
+      "Aim at roughly the deadly threshold, and never go past 1.6x it. Past that the fight stops being difficult and becomes a coin flip on the initiative order, which is not the same thing.",
+      "Run [CHECK <monster> <n>] BEFORE the fight. If it comes back trivial, easy or medium, add numbers, add a second wave, or pick a nastier variant with [VARIANTS] — do not run it as-is.",
+      "Difficulty comes from the ENEMIES PLAYING WELL, not from inflated hit points. Focus fire, target the casters, use cover, break line of sight, ready actions, retreat and come back. A damage sponge is tedious; a tactically smart enemy at the same CR is terrifying.",
+      "Attrition is the real difficulty dial. Two hard fights before a rest hurt more than one deadly one — pressure them on slots and hit dice rather than on single-round damage spikes."
+    ],
+    "survivable_because": [
+      "TELEGRAPH before it lands. Anything that can take a character out in one turn gets a visible wind-up first, and a round to react to it.",
+      "ENEMIES HAVE MORALE. Badly hurt or clearly losing creatures flee, surrender, or parley. Only the mindless and the fanatical fight to the last hit point.",
+      "NEVER focus a downed character. Enemies turn to whoever is still standing and still a threat — this is also just what a real combatant would do.",
+      "ALWAYS an out that isn't winning. A door, a collapse, a bribe, a truce, a thing to run to. They should be able to lose the fight and not lose the campaign.",
+      "TERRAIN THEY CAN USE. Every fight has at least one feature a clever player can turn on the enemy.",
+      "No save-or-die without a warning, and no ambush that starts with a character already unconscious."
+    ]
+  },
+  "puzzles": {
+    "target": "medium",
+    "dc": 15,
+    "rules": [
+      "Standard puzzle-adjacent DC is 15. Use 12 when they've already done the legwork, 18 only when they have a real edge and know it.",
+      "Every puzzle has at least TWO solutions, and at least one that needs no roll at all — a puzzle that only opens for the character with the right skill is a locked door with extra steps.",
+      "THREE CLUES for anything they must work out. If a conclusion rests on one clue, they will miss it and the scene will stall.",
+      "NEVER a hard gate. Failure costs time, resources, noise, or a complication — never progress. If they're stuck, the way forward opens and the cost goes up.",
+      "ESCALATE HINTS on your own, without being asked: after two dead ends, an in-world nudge (the draught from the gap, the worn flagstone). After four, a character with the relevant background simply notices it. Never make them ask for help.",
+      "Reward the approach, not the phrasing. If a player has clearly understood the puzzle, do not make them say the magic words.",
+      "Medium means they should feel clever, not stuck. Around one wrong turn before it clicks is right; three is too many."
+    ]
+  }
+}

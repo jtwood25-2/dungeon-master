@@ -1,0 +1,85 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Build output
+dist/
+build/
+*.egg-info/
+
+# Environment / secrets
+.env
+.env.local
+*.key
+certs/*.pem
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs / local data
+*.log
+/tmp/
+/data/local/
+state/*.json
+state/cache/
+bin/
+state/models/
+
+# Runtime logs from the server/tunnel
+state/server.*
+state/tunnel.*
+
+# Archived campaigns (kept locally, not source)
+state/_archive/
+
+# Feedback notes are local working state
+state/feedback.jsonl
+
+# Session transcripts and reviews are local working data
+state/transcripts/
+state/reviews/
+
+# Recorded tunnel address (changes every start)
+state/tunnel-url.txt
+
+# Isolated venv for the heavy TTS model (Python 3.12 + CUDA torch)
+.venv-tts/
+
+# Reference transcripts (studied locally, not redistributed)
+state/transcripts-ref/
+state/_backups/
+state/maps/
+state/telemetry.jsonl
+data/raw/
+data/splits/
+state/audio/
+# Source audio and third-party transcripts stay local: large, and not ours to redistribute.
+critical_role_sessions/
+data/transcripts/
+data/align/
+data/clean/
+data/voices/
+data/tts_samples/
+state/models/piper/
+state/models/campplus*.onnx
+data/register_labels*.jsonl
+data/voice_audition/
+
+# ---- the group's own data, which is not part of the project ----
+# state/ holds live campaigns, transcripts, recorded session audio, and VOICE EMBEDDINGS
+# tagged with the players' real first names. The embeddings are biometric and the transcripts
+# are a record of an evening with named people in it; neither belongs in a shared repository,
+# and a collaborator cloning this needs the code, not somebody else's table.
+state/
+!state/.gitkeep
+
+# Generated prep and benchmark output: reproducible from the tools, and large.
+state/prep/
+state/analysis/
+state/cache/
